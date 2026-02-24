@@ -151,6 +151,99 @@ async def publish_to_kafka(topic: str, data: dict) -> bool:
         return False
 
 
+class ChatRequest(BaseModel):
+    student_id: str
+    message: str
+    student_level: Literal["beginner", "intermediate", "advanced"] = "beginner"
+    conversation_history: Optional[list] = None
+
+
+class ChatResponse(BaseModel):
+    reply: str
+    classification: str
+    confidence: float
+
+
+SYSTEM_PROMPTS = {
+    "explain": """You are a friendly Python tutor. Explain Python concepts clearly with:
+- Simple language for beginners
+- Concrete code examples
+- Common mistakes to avoid
+Keep responses concise (3-5 paragraphs max). Use markdown for code blocks.""",
+
+    "debug": """You are a Python debugging expert. Help students fix errors by:
+- Identifying the root cause of the error
+- Explaining WHY it happened
+- Giving a hint (not the full solution) first
+- Then showing the fix if they're stuck
+Keep responses focused and practical.""",
+
+    "exercise": """You are a Python exercise generator. Create coding challenges that:
+- Are appropriate for the student's level
+- Have clear problem statements
+- Include example inputs/outputs
+- Build on what they're learning
+Format: Problem description, then starter code template.""",
+
+    "review": """You are a Python code reviewer. Analyze student code for:
+- Correctness and logic errors
+- PEP 8 style compliance
+- Efficiency improvements
+- Readability suggestions
+Be encouraging but thorough. Rate code 1-10.""",
+
+    "progress": """You are a learning progress coach. Based on the student's question about progress:
+- Summarize their learning journey
+- Highlight strengths and areas to improve
+- Suggest next steps
+- Be motivating and specific.""",
+
+    "unclassified": """You are a helpful Python tutor. Answer the student's question helpfully and suggest how LearnFlow can help them learn Python better."""
+}
+
+
+async def generate_ai_response(message: str, classification: str, student_level: str, history: list = None) -> str:
+    """Generate AI tutoring response based on classification"""
+    system_prompt = SYSTEM_PROMPTS.get(classification, SYSTEM_PROMPTS["unclassified"])
+
+    messages = [{"role": "system", "content": system_prompt}]
+
+    if history:
+        for h in history[-6:]:  # last 6 messages for context
+            messages.append({"role": h.get("role", "user"), "content": h.get("content", "")})
+
+    messages.append({"role": "user", "content": message})
+
+    response = await openai_client.chat.completions.create(
+        model=AI_MODEL,
+        messages=messages,
+        temperature=0.7,
+        max_tokens=600
+    )
+    return response.choices[0].message.content
+
+
+@app.post("/answer", response_model=ChatResponse)
+async def answer_student_query(req: ChatRequest):
+    """Classify query AND generate full AI response — used by frontend chat"""
+    try:
+        classification = await classify_query_with_openai(req.message, req.student_level)
+        reply = await generate_ai_response(
+            req.message,
+            classification.classification,
+            req.student_level,
+            req.conversation_history or []
+        )
+        return ChatResponse(
+            reply=reply,
+            classification=classification.classification,
+            confidence=classification.confidence
+        )
+    except Exception as e:
+        logger.error(f"Answer generation failed: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 # API Endpoints
 @app.post("/query", response_model=QueryClassification)
 async def triage_student_query(query: StudentQuery):

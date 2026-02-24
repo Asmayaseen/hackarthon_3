@@ -1,10 +1,10 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Button } from '@/components/ui/button'
-import { MessageCircle, Send } from 'lucide-react'
+import { MessageCircle, Send, X, Loader2 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { toast } from 'sonner'
+import ReactMarkdown from 'react-markdown'
 
 interface Message {
   role: 'user' | 'ai'
@@ -13,12 +13,15 @@ interface Message {
 
 interface AISidekickProps {
   struggleDetected: boolean
+  studentId?: string
 }
 
-export default function AISidekick({ struggleDetected }: AISidekickProps) {
+export default function AISidekick({ struggleDetected, studentId = 'demo-student' }: AISidekickProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')
+  const [loading, setLoading] = useState(false)
+  const bottomRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     if (struggleDetected && !isOpen) {
@@ -26,24 +29,38 @@ export default function AISidekick({ struggleDetected }: AISidekickProps) {
       setMessages([
         {
           role: 'ai',
-          content: "I see you're stuck on Loops. Want a hint?"
-        }
+          content: "I noticed you might be struggling! I'm your AI Sidekick — ask me anything about Python and I'll help you understand it. What are you working on?",
+        },
       ])
     }
   }, [struggleDetected])
 
-  const handleSend = () => {
-    if (!input.trim()) return
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [messages])
+
+  const handleSend = async () => {
+    if (!input.trim() || loading) return
 
     const userMsg: Message = { role: 'user', content: input }
     setMessages(prev => [...prev, userMsg])
     setInput('')
+    setLoading(true)
 
-    // Mock AI response
-    setTimeout(() => {
-      const aiMsg: Message = { role: 'ai', content: 'For loops in Python: for i in range(5): print(i). Try iterating over your list!' }
-      setMessages(prev => [...prev, aiMsg])
-    }, 1000)
+    try {
+      const history = messages.map(m => ({ role: m.role === 'ai' ? 'assistant' : 'user', content: m.content }))
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: input, student_id: studentId, history }),
+      })
+      const data = await res.json()
+      setMessages(prev => [...prev, { role: 'ai', content: data.reply }])
+    } catch {
+      setMessages(prev => [...prev, { role: 'ai', content: 'Sorry, I had trouble connecting. Please try again.' }])
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -57,7 +74,7 @@ export default function AISidekick({ struggleDetected }: AISidekickProps) {
         <Button
           size="lg"
           className="w-14 h-14 rounded-full p-0 shadow-2xl bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
-          onClick={() => setIsOpen(true)}
+          onClick={() => setIsOpen(o => !o)}
         >
           <MessageCircle className="h-6 w-6" />
         </Button>
@@ -66,59 +83,73 @@ export default function AISidekick({ struggleDetected }: AISidekickProps) {
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            className="fixed bottom-24 right-6 w-80 max-h-[500px] bg-white/90 backdrop-blur-md border border-white/20 rounded-2xl shadow-2xl overflow-hidden flex flex-col z-50"
+            className="fixed bottom-24 right-6 w-96 max-h-[540px] bg-gray-900 border border-gray-700 rounded-2xl shadow-2xl overflow-hidden flex flex-col z-50"
             initial={{ opacity: 0, y: 20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ type: 'spring', stiffness: 300, damping: 25 }}
           >
-            <div className="p-4 border-b border-gray-100 bg-gradient-to-r from-blue-50 to-purple-50">
-              <h3 className="font-semibold text-gray-900 flex items-center gap-2">
-                AI Sidekick
-              </h3>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-6 px-2 mt-1 -ml-2 text-xs"
-                onClick={() => setIsOpen(false)}
-              >
-                Close
+            {/* Header */}
+            <div className="p-4 border-b border-gray-700 bg-gradient-to-r from-blue-900/50 to-purple-900/50 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+                <h3 className="font-semibold text-white">AI Python Tutor</h3>
+              </div>
+              <Button variant="ghost" size="sm" className="h-7 w-7 p-0 text-gray-400 hover:text-white" onClick={() => setIsOpen(false)}>
+                <X className="h-4 w-4" />
               </Button>
             </div>
 
-            <div className="flex-1 p-4 overflow-y-auto space-y-3">
+            {/* Messages */}
+            <div className="flex-1 p-4 overflow-y-auto space-y-3 min-h-[200px]">
+              {messages.length === 0 && (
+                <p className="text-gray-500 text-sm text-center mt-8">Ask me anything about Python! 🐍</p>
+              )}
               {messages.map((msg, idx) => (
-                <div
-                  key={idx}
-                  className={`flex ${msg.role === 'ai' ? 'justify-start' : 'justify-end'}`}
-                >
+                <div key={idx} className={`flex ${msg.role === 'ai' ? 'justify-start' : 'justify-end'}`}>
                   <div
-                    className={`max-w-[80%] p-3 rounded-2xl ${
+                    className={`max-w-[85%] p-3 rounded-2xl text-sm ${
                       msg.role === 'ai'
-                        ? 'bg-blue-100 text-blue-900'
-                        : 'bg-purple-500 text-white'
+                        ? 'bg-gray-800 text-gray-100 rounded-tl-sm'
+                        : 'bg-blue-600 text-white rounded-tr-sm'
                     }`}
                   >
-                    {msg.content}
+                    {msg.role === 'ai' ? (
+                      <div className="prose prose-sm prose-invert max-w-none">
+                        <ReactMarkdown>{msg.content}</ReactMarkdown>
+                      </div>
+                    ) : (
+                      msg.content
+                    )}
                   </div>
                 </div>
               ))}
+              {loading && (
+                <div className="flex justify-start">
+                  <div className="bg-gray-800 rounded-2xl rounded-tl-sm p-3">
+                    <Loader2 className="h-4 w-4 animate-spin text-blue-400" />
+                  </div>
+                </div>
+              )}
+              <div ref={bottomRef} />
             </div>
 
-            <div className="p-4 border-t border-gray-100 bg-white">
+            {/* Input */}
+            <div className="p-3 border-t border-gray-700 bg-gray-900">
               <div className="flex gap-2">
                 <input
                   value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  placeholder="Ask AI Sidekick..."
-                  className="flex-1 px-3 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  onKeyDown={(e) => e.key === 'Enter' && handleSend()}
+                  onChange={e => setInput(e.target.value)}
+                  placeholder="Ask about Python..."
+                  className="flex-1 px-3 py-2 bg-gray-800 border border-gray-600 text-white rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-gray-500"
+                  onKeyDown={e => e.key === 'Enter' && !e.shiftKey && handleSend()}
+                  disabled={loading}
                 />
                 <Button
                   size="sm"
                   onClick={handleSend}
-                  disabled={!input.trim()}
-                  className="px-4"
+                  disabled={!input.trim() || loading}
+                  className="px-3 bg-blue-600 hover:bg-blue-700"
                 >
                   <Send className="h-4 w-4" />
                 </Button>

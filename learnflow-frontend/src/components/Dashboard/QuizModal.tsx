@@ -1,50 +1,60 @@
 'use client'
 
-import React, { useState } from 'react'
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import React, { useState, useEffect } from 'react'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
-import dynamic from 'next/dynamic'
-import Editor from '@monaco-editor/react'
-import { useToast } from '@/components/ui/use-toast'
+import { CheckCircle, XCircle, Loader2 } from 'lucide-react'
+import { toast } from 'sonner'
 
-const API_BASE = '/api'
+interface Question {
+  id: number
+  question: string
+  options: string[]
+  answer: number
+  topic: string
+}
 
 interface QuizModalProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-  onSuccess?: () => void
+  onSuccess?: (score: number) => void
 }
 
 export default function QuizModal({ open, onOpenChange, onSuccess }: QuizModalProps) {
-  const [code, setCode] = useState('')
+  const [questions, setQuestions] = useState<Question[]>([])
+  const [answers, setAnswers] = useState<Record<number, number>>({})
+  const [submitted, setSubmitted] = useState(false)
+  const [results, setResults] = useState<any>(null)
   const [loading, setLoading] = useState(false)
-  const { toast } = useToast()
+
+  useEffect(() => {
+    if (open) {
+      setAnswers({})
+      setSubmitted(false)
+      setResults(null)
+      fetch('/api/quiz').then(r => r.json()).then(d => setQuestions(d.questions || []))
+    }
+  }, [open])
 
   const handleSubmit = async () => {
-    if (!code.trim()) return
-
+    if (Object.keys(answers).length < questions.length) {
+      toast.warning('Please answer all questions first.')
+      return
+    }
     setLoading(true)
     try {
-      const res = await fetch(`${API_BASE}/query`, {
+      const res = await fetch('/api/quiz', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ code }),
+        body: JSON.stringify({ answers }),
       })
-      if (!res.ok) throw new Error('Submission failed')
       const data = await res.json()
-      toast({
-        title: 'Quiz Submitted',
-        description: data.result || 'Code processed successfully.',
-      })
-      setCode('')
-      onOpenChange(false)
-      onSuccess?.()
-    } catch (error) {
-      toast({
-        variant: 'destructive',
-        title: 'Error',
-        description: 'Failed to submit quiz. Check console.',
-      })
+      setResults(data)
+      setSubmitted(true)
+      toast.success(`Quiz complete! Score: ${data.score}%`)
+      onSuccess?.(data.score)
+    } catch {
+      toast.error('Failed to submit quiz.')
     } finally {
       setLoading(false)
     }
@@ -52,41 +62,74 @@ export default function QuizModal({ open, onOpenChange, onSuccess }: QuizModalPr
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="max-w-xl bg-gray-900 border-gray-700 text-white">
         <DialogHeader>
-          <DialogTitle>Take Quiz</DialogTitle>
-          <DialogDescription>
-            Write code to solve: "Implement a function isPrime(n) that returns true if n is prime."
-          </DialogDescription>
+          <DialogTitle className="text-white text-xl">
+            {submitted ? `Quiz Results — ${results?.score}%` : 'Python Quiz'}
+          </DialogTitle>
         </DialogHeader>
-        <div className="space-y-4 py-4">
-          <div className="h-[300px] font-mono">
-            <Editor
-              height="300px"
-              language="python"
-              value={code}
-              onChange={(value) => setCode(value || '')}
-              theme="vs-dark"
-              options={{
-                minimap: { enabled: false },
-                scrollBeyondLastLine: false,
-                fontSize: 14,
-                wordWrap: 'on',
-              }}
-            />
+
+        {!submitted ? (
+          <div className="space-y-6 py-2">
+            {questions.map((q, qi) => (
+              <div key={q.id} className="space-y-2">
+                <p className="font-medium text-gray-100 text-sm">
+                  <span className="text-blue-400 mr-2">Q{qi + 1}.</span>{q.question}
+                </p>
+                <div className="grid grid-cols-2 gap-2">
+                  {q.options.map((opt, oi) => (
+                    <button
+                      key={oi}
+                      onClick={() => setAnswers(prev => ({ ...prev, [q.id]: oi }))}
+                      className={`px-3 py-2 rounded-lg text-sm text-left border transition-all ${
+                        answers[q.id] === oi
+                          ? 'bg-blue-600 border-blue-400 text-white'
+                          : 'bg-gray-800 border-gray-600 text-gray-300 hover:border-blue-500'
+                      }`}
+                    >
+                      {opt}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ))}
+            <div className="flex justify-end gap-3 pt-2">
+              <Button variant="outline" onClick={() => onOpenChange(false)} className="border-gray-600 text-gray-300">
+                Cancel
+              </Button>
+              <Button
+                onClick={handleSubmit}
+                disabled={loading || Object.keys(answers).length < questions.length}
+                className="bg-blue-600 hover:bg-blue-700"
+              >
+                {loading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+                Submit Quiz
+              </Button>
+            </div>
           </div>
-          <div className="flex justify-end gap-2">
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              Cancel
-            </Button>
-            <Button
-              onClick={handleSubmit}
-              disabled={loading || !code.trim()}
-            >
-              {loading ? 'Submitting...' : 'Submit & Check'}
+        ) : (
+          <div className="space-y-4 py-2">
+            <div className={`text-center p-4 rounded-xl ${results.score >= 70 ? 'bg-green-900/30 border border-green-700' : 'bg-red-900/30 border border-red-700'}`}>
+              <p className="text-3xl font-bold">{results.score}%</p>
+              <p className="text-sm text-gray-400 mt-1">{results.correct}/{results.total} correct</p>
+              {results.struggleDetected && (
+                <p className="text-yellow-400 text-sm mt-2">💡 AI Sidekick will help you review the topics you missed!</p>
+              )}
+            </div>
+            {results.results?.map((r: any) => (
+              <div key={r.id} className="flex items-start gap-2 text-sm">
+                {r.isCorrect
+                  ? <CheckCircle className="h-4 w-4 text-green-400 mt-0.5 shrink-0" />
+                  : <XCircle className="h-4 w-4 text-red-400 mt-0.5 shrink-0" />
+                }
+                <span className={r.isCorrect ? 'text-gray-300' : 'text-gray-400 line-through'}>{r.question}</span>
+              </div>
+            ))}
+            <Button onClick={() => onOpenChange(false)} className="w-full bg-blue-600 hover:bg-blue-700">
+              Close
             </Button>
           </div>
-        </div>
+        )}
       </DialogContent>
     </Dialog>
   )
