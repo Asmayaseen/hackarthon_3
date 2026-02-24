@@ -83,14 +83,14 @@ export default function AISidekick({ struggleDetected, studentId = 'demo-student
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            className="fixed bottom-24 right-6 w-96 max-h-[540px] bg-gray-900 border border-gray-700 rounded-2xl shadow-2xl overflow-hidden flex flex-col z-50"
+            className="fixed bottom-24 right-6 w-96 max-h-[540px] bg-card border border-border rounded-2xl shadow-2xl overflow-hidden flex flex-col z-50"
             initial={{ opacity: 0, y: 20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ type: 'spring', stiffness: 300, damping: 25 }}
           >
             {/* Header */}
-            <div className="p-4 border-b border-gray-700 bg-gradient-to-r from-blue-900/50 to-purple-900/50 flex items-center justify-between">
+            <div className="p-4 border-b border-border bg-gradient-to-r from-blue-600/10 to-purple-600/10 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
                 <h3 className="font-semibold text-white">AI Python Tutor</h3>
@@ -110,8 +110,8 @@ export default function AISidekick({ struggleDetected, studentId = 'demo-student
                   <div
                     className={`max-w-[85%] p-3 rounded-2xl text-sm ${
                       msg.role === 'ai'
-                        ? 'bg-gray-800 text-gray-100 rounded-tl-sm'
-                        : 'bg-blue-600 text-white rounded-tr-sm'
+                        ? 'bg-muted text-foreground rounded-tl-sm'
+                        : 'bg-primary text-primary-foreground rounded-tr-sm'
                     }`}
                   >
                     {msg.role === 'ai' ? (
@@ -135,13 +135,13 @@ export default function AISidekick({ struggleDetected, studentId = 'demo-student
             </div>
 
             {/* Input */}
-            <div className="p-3 border-t border-gray-700 bg-gray-900">
+            <div className="p-3 border-t border-border bg-card">
               <div className="flex gap-2">
                 <input
                   value={input}
                   onChange={e => setInput(e.target.value)}
                   placeholder="Ask about Python..."
-                  className="flex-1 px-3 py-2 bg-gray-800 border border-gray-600 text-white rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-gray-500"
+                  className="flex-1 px-3 py-2 bg-muted border border-border text-foreground rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent placeholder:text-muted-foreground"
                   onKeyDown={e => e.key === 'Enter' && !e.shiftKey && handleSend()}
                   disabled={loading}
                 />

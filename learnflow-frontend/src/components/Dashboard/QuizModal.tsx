@@ -62,9 +62,9 @@ export default function QuizModal({ open, onOpenChange, onSuccess }: QuizModalPr
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-xl bg-gray-900 border-gray-700 text-white">
+      <DialogContent className="max-w-xl bg-card border-border text-foreground">
         <DialogHeader>
-          <DialogTitle className="text-white text-xl">
+          <DialogTitle className="text-foreground text-xl">
             {submitted ? `Quiz Results — ${results?.score}%` : 'Python Quiz'}
           </DialogTitle>
         </DialogHeader>
@@ -73,7 +73,7 @@ export default function QuizModal({ open, onOpenChange, onSuccess }: QuizModalPr
           <div className="space-y-6 py-2">
             {questions.map((q, qi) => (
               <div key={q.id} className="space-y-2">
-                <p className="font-medium text-gray-100 text-sm">
+                <p className="font-medium text-foreground text-sm">
                   <span className="text-blue-400 mr-2">Q{qi + 1}.</span>{q.question}
                 </p>
                 <div className="grid grid-cols-2 gap-2">
@@ -83,8 +83,8 @@ export default function QuizModal({ open, onOpenChange, onSuccess }: QuizModalPr
                       onClick={() => setAnswers(prev => ({ ...prev, [q.id]: oi }))}
                       className={`px-3 py-2 rounded-lg text-sm text-left border transition-all ${
                         answers[q.id] === oi
-                          ? 'bg-blue-600 border-blue-400 text-white'
-                          : 'bg-gray-800 border-gray-600 text-gray-300 hover:border-blue-500'
+                          ? 'bg-primary border-primary text-primary-foreground'
+                          : 'bg-muted border-border text-foreground hover:border-primary/50'
                       }`}
                     >
                       {opt}
