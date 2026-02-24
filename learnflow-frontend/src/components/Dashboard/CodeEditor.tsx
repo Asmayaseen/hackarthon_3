@@ -75,7 +75,7 @@ export default function CodeEditor() {
   }
 
   return (
-    <div className="grid grid-cols-2 gap-4 h-[calc(100vh-220px)]">
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 h-[calc(100vh-220px)] min-h-[500px]">
       {/* Editor panel */}
       <div className="bg-card border border-border rounded-xl overflow-hidden flex flex-col">
         <div className="px-4 py-3 border-b border-border flex items-center justify-between">

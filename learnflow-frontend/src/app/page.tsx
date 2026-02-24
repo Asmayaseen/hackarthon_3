@@ -106,10 +106,10 @@ export default function Home() {
           </p>
 
           {/* CTAs */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center pt-2">
+          <div className="flex justify-center pt-2">
             <Link
               href="/dashboard"
-              className="group inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-semibold rounded-xl shadow-xl shadow-indigo-500/30 transition-all hover:scale-105 hover:shadow-indigo-500/50"
+              className="group inline-flex items-center gap-2 px-10 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-semibold rounded-xl shadow-xl shadow-indigo-500/30 transition-all hover:scale-105 hover:shadow-indigo-500/50"
             >
               Start Learning
               <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
@@ -118,7 +118,7 @@ export default function Home() {
               href="https://github.com/Asmayaseen/hackarthon_3"
               target="_blank"
               rel="noreferrer"
-              className="inline-flex items-center gap-2 px-8 py-4 bg-card border border-border text-foreground font-semibold rounded-xl hover:border-indigo-500/50 hover:bg-accent transition-all hover:scale-105"
+              className="hidden inline-flex items-center gap-2 px-8 py-4 bg-card border border-border text-foreground font-semibold rounded-xl hover:border-indigo-500/50 hover:bg-accent transition-all hover:scale-105"
             >
               <Github className="h-4 w-4" />
               View Source

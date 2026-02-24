@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { Button } from '@/components/ui/button'
-import { MessageCircle, Send, X, Loader2 } from 'lucide-react'
+import { MessageCircle, Send, X, Loader2, Bot, User, Sparkles } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import ReactMarkdown from 'react-markdown'
 
@@ -16,48 +16,60 @@ interface AISidekickProps {
   studentId?: string
 }
 
+const SUGGESTIONS = [
+  'How do for loops work?',
+  'Explain list comprehensions',
+  'What is a Python class?',
+  'How do I handle errors?',
+]
+
 export default function AISidekick({ struggleDetected, studentId = 'demo-student' }: AISidekickProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
   const bottomRef = useRef<HTMLDivElement>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     if (struggleDetected && !isOpen) {
       setIsOpen(true)
-      setMessages([
-        {
-          role: 'ai',
-          content: "I noticed you might be struggling! I'm your AI Sidekick — ask me anything about Python and I'll help you understand it. What are you working on?",
-        },
-      ])
+      setMessages([{
+        role: 'ai',
+        content: "I noticed you might be having some difficulty! I'm your **AI Python Tutor**. Ask me anything — I'm here to help you understand Python concepts clearly. 🐍",
+      }])
     }
   }, [struggleDetected])
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [messages])
+  }, [messages, loading])
 
-  const handleSend = async () => {
-    if (!input.trim() || loading) return
+  useEffect(() => {
+    if (isOpen) setTimeout(() => inputRef.current?.focus(), 300)
+  }, [isOpen])
 
-    const userMsg: Message = { role: 'user', content: input }
+  const sendMessage = async (text: string) => {
+    if (!text.trim() || loading) return
+    const userMsg: Message = { role: 'user', content: text }
     setMessages(prev => [...prev, userMsg])
     setInput('')
     setLoading(true)
 
     try {
-      const history = messages.map(m => ({ role: m.role === 'ai' ? 'assistant' : 'user', content: m.content }))
+      const history = messages.map(m => ({
+        role: m.role === 'ai' ? 'assistant' : 'user',
+        content: m.content,
+      }))
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: input, student_id: studentId, history }),
+        body: JSON.stringify({ message: text, student_id: studentId, history }),
       })
       const data = await res.json()
       setMessages(prev => [...prev, { role: 'ai', content: data.reply }])
     } catch {
-      setMessages(prev => [...prev, { role: 'ai', content: 'Sorry, I had trouble connecting. Please try again.' }])
+      setMessages(prev => [...prev, { role: 'ai', content: "Sorry, I couldn't connect. Please try again." }])
     } finally {
       setLoading(false)
     }
@@ -65,69 +77,114 @@ export default function AISidekick({ struggleDetected, studentId = 'demo-student
 
   return (
     <>
-      <motion.div
-        className="fixed bottom-6 right-6 z-50"
-        initial={{ scale: 0 }}
-        animate={{ scale: 1 }}
-        transition={{ type: 'spring', stiffness: 400, damping: 20 }}
+      {/* Floating button */}
+      <motion.button
+        initial={{ scale: 0, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ type: 'spring', stiffness: 400, damping: 20, delay: 0.5 }}
+        onClick={() => setIsOpen(o => !o)}
+        className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-white shadow-2xl shadow-indigo-500/40 flex items-center justify-center hover:scale-110 transition-transform"
+        aria-label="AI Tutor Chat"
       >
-        <Button
-          size="lg"
-          className="w-14 h-14 rounded-full p-0 shadow-2xl bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
-          onClick={() => setIsOpen(o => !o)}
-        >
-          <MessageCircle className="h-6 w-6" />
-        </Button>
-      </motion.div>
+        <AnimatePresence mode="wait">
+          {isOpen
+            ? <motion.div key="x" initial={{ rotate: -90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 90, opacity: 0 }} transition={{ duration: 0.15 }}><X className="h-5 w-5" /></motion.div>
+            : <motion.div key="chat" initial={{ rotate: 90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: -90, opacity: 0 }} transition={{ duration: 0.15 }}><MessageCircle className="h-5 w-5" /></motion.div>
+          }
+        </AnimatePresence>
+      </motion.button>
 
+      {/* Chat panel */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            className="fixed bottom-24 right-6 w-96 max-h-[540px] bg-card border border-border rounded-2xl shadow-2xl overflow-hidden flex flex-col z-50"
-            initial={{ opacity: 0, y: 20, scale: 0.95 }}
+            initial={{ opacity: 0, y: 16, scale: 0.96 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 20, scale: 0.95 }}
-            transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+            exit={{ opacity: 0, y: 16, scale: 0.96 }}
+            transition={{ type: 'spring', stiffness: 320, damping: 28 }}
+            className="fixed bottom-24 right-6 z-50 w-[92vw] sm:w-[400px] max-h-[75vh] sm:max-h-[560px] flex flex-col rounded-2xl border border-border bg-card shadow-2xl shadow-black/20 overflow-hidden"
           >
             {/* Header */}
-            <div className="p-4 border-b border-border bg-gradient-to-r from-blue-600/10 to-purple-600/10 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-                <h3 className="font-semibold text-white">AI Python Tutor</h3>
+            <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-gradient-to-r from-indigo-500/10 to-purple-500/10">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
+                  <Bot className="h-4 w-4 text-white" />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-foreground">AI Python Tutor</p>
+                  <div className="flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                    <span className="text-xs text-muted-foreground">Online</span>
+                  </div>
+                </div>
               </div>
-              <Button variant="ghost" size="sm" className="h-7 w-7 p-0 text-gray-400 hover:text-white" onClick={() => setIsOpen(false)}>
+              <button
+                onClick={() => setIsOpen(false)}
+                className="w-7 h-7 rounded-lg flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-accent transition-all"
+              >
                 <X className="h-4 w-4" />
-              </Button>
+              </button>
             </div>
 
             {/* Messages */}
-            <div className="flex-1 p-4 overflow-y-auto space-y-3 min-h-[200px]">
+            <div className="flex-1 overflow-y-auto p-4 space-y-3">
               {messages.length === 0 && (
-                <p className="text-gray-500 text-sm text-center mt-8">Ask me anything about Python! 🐍</p>
-              )}
-              {messages.map((msg, idx) => (
-                <div key={idx} className={`flex ${msg.role === 'ai' ? 'justify-start' : 'justify-end'}`}>
-                  <div
-                    className={`max-w-[85%] p-3 rounded-2xl text-sm ${
-                      msg.role === 'ai'
-                        ? 'bg-muted text-foreground rounded-tl-sm'
-                        : 'bg-primary text-primary-foreground rounded-tr-sm'
-                    }`}
-                  >
-                    {msg.role === 'ai' ? (
-                      <div className="prose prose-sm prose-invert max-w-none">
-                        <ReactMarkdown>{msg.content}</ReactMarkdown>
-                      </div>
-                    ) : (
-                      msg.content
-                    )}
+                <div className="text-center py-6 space-y-3">
+                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 flex items-center justify-center mx-auto">
+                    <Sparkles className="h-6 w-6 text-primary" />
+                  </div>
+                  <p className="text-sm text-muted-foreground">Ask me anything about Python!</p>
+                  <div className="flex flex-wrap gap-2 justify-center">
+                    {SUGGESTIONS.map(s => (
+                      <button
+                        key={s}
+                        onClick={() => sendMessage(s)}
+                        className="px-3 py-1.5 text-xs bg-muted hover:bg-accent border border-border rounded-full text-foreground transition-colors"
+                      >
+                        {s}
+                      </button>
+                    ))}
                   </div>
                 </div>
+              )}
+
+              {messages.map((msg, idx) => (
+                <div key={idx} className={`flex gap-2.5 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                  {msg.role === 'ai' && (
+                    <div className="w-7 h-7 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shrink-0 mt-0.5">
+                      <Bot className="h-3.5 w-3.5 text-white" />
+                    </div>
+                  )}
+                  <div className={`max-w-[80%] px-3.5 py-2.5 rounded-2xl text-sm leading-relaxed ${
+                    msg.role === 'ai'
+                      ? 'bg-muted text-foreground rounded-tl-sm'
+                      : 'bg-primary text-primary-foreground rounded-tr-sm'
+                  }`}>
+                    {msg.role === 'ai' ? (
+                      <div className="prose prose-sm dark:prose-invert max-w-none prose-p:my-1 prose-headings:my-1 prose-pre:my-1 prose-code:text-indigo-400">
+                        <ReactMarkdown>{msg.content}</ReactMarkdown>
+                      </div>
+                    ) : msg.content}
+                  </div>
+                  {msg.role === 'user' && (
+                    <div className="w-7 h-7 rounded-full bg-secondary border border-border flex items-center justify-center shrink-0 mt-0.5">
+                      <User className="h-3.5 w-3.5 text-muted-foreground" />
+                    </div>
+                  )}
+                </div>
               ))}
+
               {loading && (
-                <div className="flex justify-start">
-                  <div className="bg-gray-800 rounded-2xl rounded-tl-sm p-3">
-                    <Loader2 className="h-4 w-4 animate-spin text-blue-400" />
+                <div className="flex gap-2.5 items-center">
+                  <div className="w-7 h-7 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shrink-0">
+                    <Bot className="h-3.5 w-3.5 text-white" />
+                  </div>
+                  <div className="bg-muted px-4 py-3 rounded-2xl rounded-tl-sm">
+                    <div className="flex gap-1">
+                      <span className="w-2 h-2 rounded-full bg-muted-foreground/50 animate-bounce" style={{ animationDelay: '0ms' }} />
+                      <span className="w-2 h-2 rounded-full bg-muted-foreground/50 animate-bounce" style={{ animationDelay: '150ms' }} />
+                      <span className="w-2 h-2 rounded-full bg-muted-foreground/50 animate-bounce" style={{ animationDelay: '300ms' }} />
+                    </div>
                   </div>
                 </div>
               )}
@@ -136,20 +193,21 @@ export default function AISidekick({ struggleDetected, studentId = 'demo-student
 
             {/* Input */}
             <div className="p-3 border-t border-border bg-card">
-              <div className="flex gap-2">
+              <div className="flex gap-2 items-center">
                 <input
+                  ref={inputRef}
                   value={input}
                   onChange={e => setInput(e.target.value)}
+                  onKeyDown={e => e.key === 'Enter' && !e.shiftKey && sendMessage(input)}
                   placeholder="Ask about Python..."
-                  className="flex-1 px-3 py-2 bg-muted border border-border text-foreground rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent placeholder:text-muted-foreground"
-                  onKeyDown={e => e.key === 'Enter' && !e.shiftKey && handleSend()}
                   disabled={loading}
+                  className="flex-1 px-3.5 py-2.5 bg-muted border border-border text-foreground placeholder:text-muted-foreground rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-all"
                 />
                 <Button
                   size="sm"
-                  onClick={handleSend}
+                  onClick={() => sendMessage(input)}
                   disabled={!input.trim() || loading}
-                  className="px-3 bg-blue-600 hover:bg-blue-700"
+                  className="w-10 h-10 p-0 rounded-xl bg-gradient-to-br from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white border-0 shrink-0"
                 >
                   <Send className="h-4 w-4" />
                 </Button>
