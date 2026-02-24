@@ -1,0 +1,40 @@
+openapi: 3.0.0
+info:
+  title: Progress Service API
+paths:
+  /progress/{student_id}:
+    get:
+      summary: Get student progress
+      parameters:
+        - name: student_id
+          in: path
+          required: true
+          schema: {type: string}
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  mastery_score: {type: number}
+                  topics_struggling: {type: array}
+  /struggles:
+    get:
+      summary: List active struggles
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/StruggleAlert'
+components:
+  schemas:
+    StruggleAlert:
+      type: object
+      properties:
+        alert_id: {type: string}
+        severity: {type: string}
+        message: {type: string}

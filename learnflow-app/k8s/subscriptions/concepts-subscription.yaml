@@ -1,0 +1,47 @@
+apiVersion: dapr.io/v1alpha1
+kind: Subscription
+metadata:
+  name: concepts-subscription
+  namespace: learnflow
+spec:
+  pubsubname: kafka-pubsub
+  topic: learning.query.explain
+  route: /dapr/subscribe
+  metadata:
+    rawPayload: "false"
+---
+apiVersion: dapr.io/v1alpha1
+kind: Subscription
+metadata:
+  name: debug-subscription
+  namespace: learnflow
+spec:
+  pubsubname: kafka-pubsub
+  topic: code.debug.request
+  route: /dapr/subscribe
+  metadata:
+    rawPayload: "false"
+---
+apiVersion: dapr.io/v1alpha1
+kind: Subscription
+metadata:
+  name: code-review-subscription
+  namespace: learnflow
+spec:
+  pubsubname: kafka-pubsub
+  topic: code.review.request
+  route: /dapr/subscribe
+  metadata:
+    rawPayload: "false"
+---
+apiVersion: dapr.io/v1alpha1
+kind: Subscription
+metadata:
+  name: triage-routing-subscription
+  namespace: learnflow
+spec:
+  pubsubname: kafka-pubsub
+  topic: learning.query.routed
+  route: /metrics
+  metadata:
+    rawPayload: "false"

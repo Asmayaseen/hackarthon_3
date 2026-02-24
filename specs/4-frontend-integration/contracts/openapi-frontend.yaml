@@ -1,0 +1,15 @@
+openapi: 3.0.0
+paths:
+  /progress/{student_id}:
+    get:
+      responses: {200: {content: {application/json: {schema: {$ref: '#/components/schemas/Progress'}}}}}
+  /query:
+    post:
+      requestBody: {content: {application/json: {schema: {type: object, properties: {code: {type: string}}}}}}
+  /struggles:
+    get:
+      responses: {200: {content: {application/json: {schema: {type: array, items: {$ref: '#/components/schemas/StruggleAlert'}}}}}}
+components:
+  schemas:
+    Progress: {type: object, properties: {mastery_score: {type: number}, trend: {type: string}}}
+    StruggleAlert: {type: object, properties: {type: {type: string}, severity: {type: string}}}

@@ -1,0 +1,103 @@
+apiVersion: dapr.io/v1alpha1
+kind: Component
+metadata:
+  name: kafka-pubsub
+spec:
+  type: pubsub.kafka
+  version: v1
+  metadata:
+  - name: brokers
+    value: "kafka-cluster-kafka-bootstrap.kafka:9092"
+  - name: authType
+    value: "none"
+  - name: consumerID
+    value: "{uuid}"
+  - name: topic
+    value: "learning.query.explain"
+  - name: maxMessageBytes
+    value: "1024"
+---
+apiVersion: dapr.io/v1alpha1
+kind: Component
+metadata:
+  name: kafka-pubsub-debug
+spec:
+  type: pubsub.kafka
+  version: v1
+  metadata:
+  - name: brokers
+    value: "kafka-cluster-kafka-bootstrap.kafka:9092"
+  - name: authType
+    value: "none"
+  - name: consumerID
+    value: "{uuid}"
+  - name: topic
+    value: "code.debug.request"
+---
+apiVersion: dapr.io/v1alpha1
+kind: Component
+metadata:
+  name: kafka-pubsub-exercise
+spec:
+  type: pubsub.kafka
+  version: v1
+  metadata:
+  - name: brokers
+    value: "kafka-cluster-kafka-bootstrap.kafka:9092"
+  - name: authType
+    value: "none"
+  - name: consumerID
+    value: "{uuid}"
+  - name: topic
+    value: "exercise.generate"
+---
+apiVersion: dapr.io/v1alpha1
+kind: Component
+metadata:
+  name: kafka-pubsub-review
+spec:
+  type: pubsub.kafka
+  version: v1
+  metadata:
+  - name: brokers
+    value: "kafka-cluster-kafka-bootstrap.kafka:9092"
+  - name: authType
+    value: "none"
+  - name: consumerID
+    value: "{uuid}"
+  - name: topic
+    value: "code.review.request"
+---
+apiVersion: dapr.io/v1alpha1
+kind: Component
+metadata:
+  name: kafka-pubsub-progress
+spec:
+  type: pubsub.kafka
+  version: v1
+  metadata:
+  - name: brokers
+    value: "kafka-cluster-kafka-bootstrap.kafka:9092"
+  - name: authType
+    value: "none"
+  - name: consumerID
+    value: "{uuid}"
+  - name: topic
+    value: "progress.summary"
+---
+apiVersion: dapr.io/v1alpha1
+kind: Component
+metadata:
+  name: kafka-pubsub-unclassified
+spec:
+  type: pubsub.kafka
+  version: v1
+  metadata:
+  - name: brokers
+    value: "kafka-cluster-kafka-bootstrap.kafka:9092"
+  - name: authType
+    value: "none"
+  - name: consumerID
+    value: "{uuid}"
+  - name: topic
+    value: "learning.query.unclassified"
