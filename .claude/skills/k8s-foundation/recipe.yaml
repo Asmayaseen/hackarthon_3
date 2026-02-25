@@ -1,0 +1,52 @@
+version: "1.0"
+title: "k8s-foundation"
+description: |
+  Check Kubernetes cluster health and set up foundational resources for LearnFlow.
+  Creates namespaces, installs Dapr, and verifies cluster readiness before
+  deploying any services. Always run this first.
+
+instructions: |
+  # Kubernetes Foundation Setup
+
+  Initialize the Kubernetes cluster for LearnFlow deployment.
+
+  ## Steps
+
+  1. Verify cluster health:
+     ```bash
+     python scripts/check_cluster.py
+     ```
+
+  2. Create required namespaces (learnflow, kafka, dapr-system):
+     ```bash
+     bash scripts/setup_namespaces.sh
+     ```
+
+  3. Install Dapr runtime:
+     ```bash
+     bash scripts/install_dapr.sh
+     ```
+
+  4. Verify everything is ready:
+     ```bash
+     python scripts/verify.py
+     ```
+
+  ## Validation
+  - kubectl cluster-info returns cluster endpoint
+  - Namespaces learnflow, kafka, dapr-system exist
+  - Dapr operator running in dapr-system
+
+activities:
+  - description: "Check cluster health"
+    command: "python .claude/skills/k8s-foundation/scripts/check_cluster.py"
+  - description: "Setup namespaces"
+    command: "bash .claude/skills/k8s-foundation/scripts/setup_namespaces.sh"
+  - description: "Install Dapr"
+    command: "bash .claude/skills/k8s-foundation/scripts/install_dapr.sh"
+  - description: "Verify foundation"
+    command: "python .claude/skills/k8s-foundation/scripts/verify.py"
+
+extensions:
+  - type: builtin
+    name: developer

@@ -1,0 +1,58 @@
+version: "1.0"
+title: "kafka-k8s-setup"
+description: |
+  Deploy Apache Kafka on Kubernetes for LearnFlow event-driven microservices.
+  Uses Strimzi operator with KRaft mode for production-ready Kafka clusters.
+  Creates all required LearnFlow topics: learning.*, code.*, exercise.*, struggle.*
+
+instructions: |
+  # Kafka Kubernetes Setup
+
+  Deploy Apache Kafka on Kubernetes using Strimzi operator.
+
+  ## Steps
+
+  1. Deploy Kafka cluster:
+     ```bash
+     bash scripts/deploy.sh
+     ```
+
+  2. Create LearnFlow topics:
+     ```bash
+     bash scripts/create-topics.sh
+     ```
+
+  3. Verify all pods are running:
+     ```bash
+     python scripts/verify.py
+     ```
+
+  4. Confirm all topics exist before proceeding.
+
+  ## LearnFlow Kafka Topics
+  | Topic                    | Publisher | Consumer     |
+  |--------------------------|-----------|--------------|
+  | learning.query.explain   | triage    | concepts     |
+  | code.debug.request       | triage    | debug        |
+  | exercise.generate        | triage    | exercise     |
+  | code.review.request      | triage    | code-review  |
+  | progress.update          | all       | progress     |
+  | struggle.alert           | progress  | frontend     |
+
+  ## Validation Checklist
+  - All Kafka pods in Running state
+  - All 6 LearnFlow topics created
+  - Producer/consumer test passes
+  - Dapr pub/sub component connected
+
+activities:
+  - description: "Deploy Kafka to Kubernetes"
+    command: "bash .claude/skills/kafka-k8s-setup/scripts/deploy.sh"
+  - description: "Create LearnFlow Kafka topics"
+    command: "bash .claude/skills/kafka-k8s-setup/scripts/create-topics.sh"
+  - description: "Verify Kafka deployment"
+    command: "python .claude/skills/kafka-k8s-setup/scripts/verify.py"
+
+extensions:
+  - type: builtin
+    name: developer

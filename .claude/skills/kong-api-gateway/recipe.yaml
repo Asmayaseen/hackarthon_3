@@ -1,0 +1,52 @@
+version: "1.0"
+title: "kong-api-gateway"
+description: |
+  Deploy Kong API Gateway on Kubernetes for LearnFlow. Provides centralized
+  JWT authentication, rate limiting, and intelligent routing to all backend
+  microservices with a single entry point.
+
+instructions: |
+  # Kong API Gateway Setup
+
+  Deploy Kong API Gateway for centralized LearnFlow API management.
+
+  ## Steps
+
+  1. Deploy Kong via Helm:
+     ```bash
+     bash scripts/deploy.sh
+     ```
+
+  2. Configure service routes:
+     ```bash
+     python scripts/configure_routes.py
+     ```
+
+  3. Enable JWT authentication:
+     ```bash
+     python scripts/setup_jwt.py
+     ```
+
+  4. Verify routing works:
+     ```bash
+     python scripts/verify.py
+     ```
+
+  ## Validation
+  - Kong pod Running in kong namespace
+  - All LearnFlow routes return correct upstream responses
+  - JWT plugin active and blocking invalid tokens
+
+activities:
+  - description: "Deploy Kong"
+    command: "bash .claude/skills/kong-api-gateway/scripts/deploy.sh"
+  - description: "Configure routes"
+    command: "python .claude/skills/kong-api-gateway/scripts/configure_routes.py"
+  - description: "Setup JWT auth"
+    command: "python .claude/skills/kong-api-gateway/scripts/setup_jwt.py"
+  - description: "Verify gateway"
+    command: "python .claude/skills/kong-api-gateway/scripts/verify.py"
+
+extensions:
+  - type: builtin
+    name: developer

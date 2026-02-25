@@ -1,0 +1,51 @@
+version: "1.0"
+title: "prometheus-grafana-setup"
+description: |
+  Deploy Prometheus and Grafana monitoring stack for LearnFlow on Kubernetes.
+  Provides metrics collection, alerting, and pre-built dashboards for all
+  LearnFlow microservices including request rates, latency, and error rates.
+
+instructions: |
+  # Prometheus + Grafana Monitoring
+
+  Deploy complete observability stack for LearnFlow.
+
+  ## Steps
+
+  1. Deploy monitoring stack via Helm:
+     ```bash
+     bash scripts/deploy.sh
+     ```
+
+  2. Import LearnFlow dashboards:
+     ```bash
+     python scripts/import_dashboards.py
+     ```
+
+  3. Verify stack is healthy:
+     ```bash
+     python scripts/verify.py
+     ```
+
+  4. Access Grafana (default: admin/admin):
+     ```bash
+     kubectl port-forward svc/grafana 3001:80 -n monitoring
+     ```
+     Open: http://localhost:3001
+
+  ## Validation
+  - Prometheus scraping all LearnFlow services
+  - Grafana dashboard shows request rates
+  - Alerting rules configured for error rate > 5%
+
+activities:
+  - description: "Deploy Prometheus + Grafana"
+    command: "bash .claude/skills/prometheus-grafana-setup/scripts/deploy.sh"
+  - description: "Import dashboards"
+    command: "python .claude/skills/prometheus-grafana-setup/scripts/import_dashboards.py"
+  - description: "Verify monitoring"
+    command: "python .claude/skills/prometheus-grafana-setup/scripts/verify.py"
+
+extensions:
+  - type: builtin
+    name: developer

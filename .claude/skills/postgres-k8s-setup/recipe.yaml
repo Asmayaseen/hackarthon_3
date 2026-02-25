@@ -1,0 +1,60 @@
+version: "1.0"
+title: "postgres-k8s-setup"
+description: |
+  Deploy PostgreSQL on Kubernetes using CloudNativePG operator for LearnFlow.
+  Handles cluster creation, schema migrations, and connection secret management.
+  Stores student progress, code submissions, and exercise data.
+
+instructions: |
+  # PostgreSQL Kubernetes Setup
+
+  Deploy PostgreSQL on Kubernetes using CloudNativePG operator.
+
+  ## Steps
+
+  1. Install CloudNativePG operator:
+     ```bash
+     bash scripts/install-operator.sh
+     ```
+
+  2. Deploy PostgreSQL cluster:
+     ```bash
+     bash scripts/deploy.sh
+     ```
+
+  3. Run database migrations:
+     ```bash
+     bash scripts/migrate.sh
+     ```
+
+  4. Verify database is ready:
+     ```bash
+     python scripts/verify.py
+     ```
+
+  ## LearnFlow Database Schema
+  - students: user profiles, auth data
+  - progress: mastery scores per topic
+  - submissions: code execution history
+  - exercises: generated exercises and grades
+  - sessions: conversation history
+
+  ## Validation Checklist
+  - PostgreSQL pods in Running state
+  - Connection secret created
+  - All migrations applied
+  - Can connect from learnflow namespace
+
+activities:
+  - description: "Install CloudNativePG operator"
+    command: "bash .claude/skills/postgres-k8s-setup/scripts/install-operator.sh"
+  - description: "Deploy PostgreSQL cluster"
+    command: "bash .claude/skills/postgres-k8s-setup/scripts/deploy.sh"
+  - description: "Run migrations"
+    command: "bash .claude/skills/postgres-k8s-setup/scripts/migrate.sh"
+  - description: "Verify database"
+    command: "python .claude/skills/postgres-k8s-setup/scripts/verify.py"
+
+extensions:
+  - type: builtin
+    name: developer

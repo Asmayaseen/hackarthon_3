@@ -1,0 +1,47 @@
+version: "1.0"
+title: "argocd-app-deployment"
+description: |
+  Deploy and manage LearnFlow using ArgoCD GitOps continuous delivery.
+  Installs ArgoCD, configures auto-sync from the GitHub repository, and
+  manages multi-environment deployments with self-healing enabled.
+
+instructions: |
+  # ArgoCD Application Deployment
+
+  Set up GitOps-based continuous delivery for LearnFlow.
+
+  ## Steps
+
+  1. Install ArgoCD:
+     ```bash
+     bash scripts/install.sh
+     ```
+
+  2. Apply LearnFlow ArgoCD applications:
+     ```bash
+     bash scripts/apply_apps.sh
+     ```
+
+  3. Verify sync status:
+     ```bash
+     python scripts/verify.py
+     ```
+
+  ## GitOps Flow
+  Git push → GitHub Actions → Image built → Manifest updated → ArgoCD syncs → Cluster updated
+
+  ## Validation
+  - ArgoCD server Running in argocd namespace
+  - learnflow Application status: Synced + Healthy
+
+activities:
+  - description: "Install ArgoCD"
+    command: "bash .claude/skills/argocd-app-deployment/scripts/install.sh"
+  - description: "Apply LearnFlow apps"
+    command: "bash .claude/skills/argocd-app-deployment/scripts/apply_apps.sh"
+  - description: "Verify deployment"
+    command: "python .claude/skills/argocd-app-deployment/scripts/verify.py"
+
+extensions:
+  - type: builtin
+    name: developer

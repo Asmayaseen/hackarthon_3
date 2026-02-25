@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mcp-server
+  namespace: learnflow
+  labels:
+    app: mcp-server
+    app.kubernetes.io/part-of: learnflow
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mcp-server
+  template:
+    metadata:
+      labels:
+        app: mcp-server
+      annotations:
+        dapr.io/enabled: "true"
+        dapr.io/app-id: "mcp-server"
+        dapr.io/app-port: "8006"
+    spec:
+      containers:
+        - name: mcp-server
+          image: learnflow/mcp-server:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8006
+          env:
+            - name: PROGRESS_SERVICE_URL
+              value: "http://progress-service:8004"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8006
+            initialDelaySeconds: 10
+            periodSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8006
+            initialDelaySeconds: 5
+            periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mcp-server
+  namespace: learnflow
+  labels:
+    app: mcp-server
+spec:
+  selector:
+    app: mcp-server
+  ports:
+    - port: 8006
+      targetPort: 8006
+      name: http
+  type: ClusterIP

@@ -1,0 +1,46 @@
+version: "1.0"
+title: "huggingface-deploy"
+description: |
+  Deploy LearnFlow as a Gradio app on HuggingFace Spaces for public demo access.
+  Creates an interactive Python tutoring interface that showcases all LearnFlow
+  AI capabilities without requiring Kubernetes setup.
+
+instructions: |
+  # HuggingFace Deploy
+
+  Deploy LearnFlow demo to HuggingFace Spaces.
+
+  ## Steps
+
+  1. Test Gradio app locally:
+     ```bash
+     python learnflow-app/huggingface-space/app.py
+     ```
+     Open: http://localhost:7860
+
+  2. Deploy to HuggingFace:
+     ```bash
+     bash .claude/skills/huggingface-deploy/scripts/deploy.sh
+     ```
+
+  3. Verify Space is running:
+     ```bash
+     python .claude/skills/huggingface-deploy/scripts/verify.py
+     ```
+
+  ## Validation
+  - Gradio app responds to Python questions
+  - Code execution works in sandbox
+  - HuggingFace Space shows "Running" status
+
+activities:
+  - description: "Test locally"
+    command: "python learnflow-app/huggingface-space/app.py"
+  - description: "Deploy to HuggingFace"
+    command: "bash .claude/skills/huggingface-deploy/scripts/deploy.sh"
+  - description: "Verify Space"
+    command: "python .claude/skills/huggingface-deploy/scripts/verify.py"
+
+extensions:
+  - type: builtin
+    name: developer

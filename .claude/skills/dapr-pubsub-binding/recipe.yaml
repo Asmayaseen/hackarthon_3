@@ -1,0 +1,45 @@
+version: "1.0"
+title: "dapr-pubsub-binding"
+description: |
+  Configure Dapr pub/sub components for event-driven communication between
+  LearnFlow microservices via Kafka. Handles component setup, subscription
+  testing, and troubleshooting of message delivery issues.
+
+instructions: |
+  # Dapr Pub/Sub Binding
+
+  Configure Dapr event-driven messaging for LearnFlow services.
+
+  ## Steps
+
+  1. Apply Kafka pub/sub component:
+     ```bash
+     kubectl apply -f .claude/skills/dapr-pubsub-binding/scripts/kafka-pubsub.yaml -n learnflow
+     ```
+
+  2. Test message flow:
+     ```bash
+     python .claude/skills/dapr-pubsub-binding/scripts/test_pubsub.py
+     ```
+
+  3. Verify all subscriptions active:
+     ```bash
+     python .claude/skills/dapr-pubsub-binding/scripts/verify.py
+     ```
+
+  ## Validation
+  - Dapr component deployed in learnflow namespace
+  - Test publish/subscribe completes in < 3 seconds
+  - All services show active subscriptions
+
+activities:
+  - description: "Apply Dapr component"
+    command: "kubectl apply -f .claude/skills/dapr-pubsub-binding/scripts/kafka-pubsub.yaml -n learnflow"
+  - description: "Test pub/sub"
+    command: "python .claude/skills/dapr-pubsub-binding/scripts/test_pubsub.py"
+  - description: "Verify subscriptions"
+    command: "python .claude/skills/dapr-pubsub-binding/scripts/verify.py"
+
+extensions:
+  - type: builtin
+    name: developer

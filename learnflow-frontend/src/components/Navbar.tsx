@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { ThemeToggle } from '@/components/ui/theme-toggle'
-import { Github } from 'lucide-react'
+import { Github, LogIn } from 'lucide-react'
 
 export default function Navbar() {
   const pathname = usePathname()
@@ -24,6 +24,7 @@ export default function Navbar() {
           {[
             { href: '/', label: 'Home' },
             { href: '/dashboard', label: 'Dashboard' },
+            { href: '/teacher', label: 'Teacher' },
           ].map(({ href, label }) => (
             <Link
               key={href}
@@ -50,6 +51,13 @@ export default function Navbar() {
           >
             <Github className="h-4 w-4 text-muted-foreground" />
           </a>
+          <Link
+            href="/login"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-primary/10 text-primary hover:bg-primary/20 transition-all"
+          >
+            <LogIn className="h-3.5 w-3.5" />
+            Sign In
+          </Link>
           <ThemeToggle />
         </div>
       </div>

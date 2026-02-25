@@ -1,0 +1,65 @@
+version: "1.0"
+title: "fastapi-dapr-agent"
+description: |
+  Scaffold a new FastAPI microservice with Dapr integration and OpenAI agent for LearnFlow.
+  Creates a complete service template with pub/sub event handling, K8s deployment,
+  and AI agent endpoint. Used to build all 6 LearnFlow AI tutoring services.
+
+instructions: |
+  # FastAPI + Dapr Agent Scaffolder
+
+  Create a new FastAPI microservice with Dapr pub/sub and OpenAI agent capabilities.
+
+  ## Steps
+
+  1. Scaffold new service from template:
+     ```bash
+     bash scripts/scaffold.sh <service-name> <port>
+     ```
+     Example: `bash scripts/scaffold.sh quiz-service 8006`
+
+  2. Verify the scaffold is correct:
+     ```bash
+     python scripts/verify.py <service-name>
+     ```
+
+  3. Build and load image into Minikube:
+     ```bash
+     bash scripts/build.sh <service-name>
+     ```
+
+  ## What Gets Created
+  ```
+  learnflow-app/services/<service-name>/
+  ├── main.py           # FastAPI app with Dapr + OpenAI agent
+  ├── Dockerfile        # Multi-stage production build
+  ├── requirements.txt  # Python dependencies
+  └── k8s/
+      └── deployment.yaml  # K8s manifest with Dapr annotations
+  ```
+
+  ## Service Template Pattern
+  - FastAPI with Pydantic v2 models
+  - Dapr pub/sub subscription endpoint (/dapr/subscribe)
+  - OpenAI GPT-4o-mini agent with system prompt
+  - Health check endpoint (/health)
+  - Publishes responses to Kafka topics via Dapr
+
+  ## Validation Checklist
+  - Service directory created with all required files
+  - main.py has /health and /dapr/subscribe endpoints
+  - Dockerfile builds successfully
+  - K8s manifest has Dapr sidecar annotations
+  - requirements.txt has all dependencies
+
+activities:
+  - description: "Scaffold FastAPI service"
+    command: "bash .claude/skills/fastapi-dapr-agent/scripts/scaffold.sh"
+  - description: "Build Docker image"
+    command: "bash .claude/skills/fastapi-dapr-agent/scripts/build.sh"
+  - description: "Verify service"
+    command: "python .claude/skills/fastapi-dapr-agent/scripts/verify.py"
+
+extensions:
+  - type: builtin
+    name: developer

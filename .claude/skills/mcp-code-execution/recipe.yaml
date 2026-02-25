@@ -1,0 +1,68 @@
+version: "1.0"
+title: "mcp-code-execution"
+description: |
+  Implement the MCP Code Execution pattern - wrap MCP server calls in scripts to achieve
+  80-98% token reduction. Instead of loading 50,000 tokens of MCP tool definitions,
+  use SKILL.md (~100 tokens) + scripts that execute externally and return minimal results.
+
+instructions: |
+  # MCP Code Execution Pattern
+
+  Replace direct MCP tool calls with efficient script wrappers that reduce context
+  token usage by 80-98%.
+
+  ## The Problem
+  Direct MCP: 5 servers × ~10k tokens = 50,000 tokens BEFORE typing anything.
+
+  ## The Solution
+  SKILL.md (~100 tokens) + scripts/*.py (0 tokens) = only final result in context.
+
+  ## Steps
+
+  1. Identify the MCP server to wrap:
+     ```bash
+     python scripts/analyze_mcp.py
+     ```
+
+  2. Generate an efficient script wrapper:
+     ```bash
+     python scripts/generate_wrapper.py --mcp-server <name> --operation <op>
+     ```
+
+  3. Test the wrapper returns minimal output:
+     ```bash
+     python scripts/test_wrapper.py
+     ```
+
+  4. Verify token efficiency:
+     ```bash
+     python scripts/verify.py
+     ```
+
+  ## Pattern Template
+
+  BEFORE (Direct MCP - 50,000+ tokens):
+    TOOL CALL: kubernetes.getPods() → returns full JSON (thousands of tokens)
+
+  AFTER (Script - ~10 tokens):
+    python scripts/get_pods.py learnflow → "✓ All 6 pods running"
+
+  ## Validation Checklist
+  - Script produces fewer than 50 tokens of output
+  - Script exits 0 on success, 1 on failure
+  - No MCP tools loaded at startup
+  - SKILL.md is under 200 tokens total
+
+activities:
+  - description: "Analyze existing MCP usage"
+    command: "python .claude/skills/mcp-code-execution/scripts/analyze_mcp.py"
+  - description: "Generate script wrapper"
+    command: "python .claude/skills/mcp-code-execution/scripts/generate_wrapper.py"
+  - description: "Test wrapper efficiency"
+    command: "python .claude/skills/mcp-code-execution/scripts/test_wrapper.py"
+  - description: "Verify token reduction"
+    command: "python .claude/skills/mcp-code-execution/scripts/verify.py"
+
+extensions:
+  - type: builtin
+    name: developer
