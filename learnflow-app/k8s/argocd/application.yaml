@@ -1,0 +1,62 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: learnflow
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: learnflow
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+
+  source:
+    repoURL: https://github.com/Asmayaseen/hackarthon_3
+    targetRevision: main
+    path: learnflow-app/k8s
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: learnflow
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+      allowEmpty: false
+    syncOptions:
+      - CreateNamespace=true
+      - PrunePropagationPolicy=foreground
+      - PruneLast=true
+    retry:
+      limit: 3
+      backoff:
+        duration: 10s
+        factor: 2
+        maxDuration: 2m
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: learnflow-infra
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: learnflow-infra
+spec:
+  project: default
+
+  source:
+    repoURL: https://github.com/Asmayaseen/hackarthon_3
+    targetRevision: main
+    path: learnflow-app/dapr-components
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: learnflow
+
+  syncPolicy:
+    automated:
+      prune: false
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

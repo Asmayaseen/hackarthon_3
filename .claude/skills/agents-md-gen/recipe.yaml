@@ -1,0 +1,58 @@
+version: "1.0"
+title: "agents-md-gen"
+description: |
+  Generate AGENTS.md files that teach AI agents (Claude Code, Goose, Codex) about
+  a repository's structure, conventions, and guidelines. Analyzes the codebase and
+  produces a comprehensive context file for autonomous agent development.
+
+instructions: |
+  # AGENTS.md Generator
+
+  Generate an AGENTS.md file for any repository to enable AI agents to understand
+  and work with the codebase autonomously.
+
+  ## Steps
+
+  1. Analyze the repository structure:
+     ```bash
+     python scripts/analyze_repo.py
+     ```
+
+  2. Generate the AGENTS.md file:
+     ```bash
+     python scripts/generate.py --output AGENTS.md
+     ```
+
+  3. Verify the generated file is complete:
+     ```bash
+     python scripts/verify.py
+     ```
+
+  4. Confirm AGENTS.md is placed at the repository root.
+
+  ## What Gets Generated
+  - Repository overview and purpose
+  - Directory structure with explanations
+  - Tech stack and key dependencies
+  - Coding conventions and standards
+  - Common workflows and commands
+  - Service endpoints and APIs
+  - Testing patterns
+
+  ## Validation Checklist
+  - AGENTS.md exists at repository root
+  - All major directories documented
+  - Tech stack listed accurately
+  - All commands are accurate and runnable
+
+activities:
+  - description: "Analyze repository structure"
+    command: "python .claude/skills/agents-md-gen/scripts/analyze_repo.py"
+  - description: "Generate AGENTS.md"
+    command: "python .claude/skills/agents-md-gen/scripts/generate.py --output AGENTS.md"
+  - description: "Verify output"
+    command: "python .claude/skills/agents-md-gen/scripts/verify.py"
+
+extensions:
+  - type: builtin
+    name: developer

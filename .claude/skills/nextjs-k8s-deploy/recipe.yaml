@@ -1,0 +1,62 @@
+version: "1.0"
+title: "nextjs-k8s-deploy"
+description: |
+  Build and deploy the LearnFlow Next.js frontend to Kubernetes with Docker.
+  Handles multi-stage Docker build, Minikube image loading, and K8s deployment.
+  The frontend includes Monaco code editor, AI chat, quizzes, and progress dashboard.
+
+instructions: |
+  # Next.js Kubernetes Deploy
+
+  Deploy the LearnFlow Next.js frontend to Kubernetes.
+
+  ## Steps
+
+  1. Build the Docker image:
+     ```bash
+     bash scripts/deploy.sh build
+     ```
+
+  2. Load image into Minikube:
+     ```bash
+     bash scripts/deploy.sh load
+     ```
+
+  3. Deploy to Kubernetes:
+     ```bash
+     bash scripts/deploy.sh apply
+     ```
+
+  4. Verify deployment is healthy:
+     ```bash
+     python scripts/verify.py
+     ```
+
+  5. Access the frontend:
+     ```bash
+     kubectl port-forward svc/learnflow-frontend 3000:3000 -n learnflow
+     ```
+     Open: http://localhost:3000
+
+  ## Or All-in-One
+  ```bash
+  bash scripts/deploy.sh all
+  ```
+
+  ## Validation Checklist
+  - Frontend pod in Running state in learnflow namespace
+  - Dashboard loads at http://localhost:3000
+  - Monaco Editor renders correctly
+  - API calls to triage-service succeed
+
+activities:
+  - description: "Build and deploy frontend"
+    command: "bash .claude/skills/nextjs-k8s-deploy/scripts/deploy.sh all"
+  - description: "Verify frontend deployment"
+    command: "python .claude/skills/nextjs-k8s-deploy/scripts/verify.py"
+  - description: "Port-forward for access"
+    command: "kubectl port-forward svc/learnflow-frontend 3000:3000 -n learnflow"
+
+extensions:
+  - type: builtin
+    name: developer

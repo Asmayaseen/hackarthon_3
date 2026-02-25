@@ -1,0 +1,66 @@
+version: "1.0"
+title: "docusaurus-deploy"
+description: |
+  Set up and deploy a Docusaurus documentation site for the LearnFlow platform on Kubernetes.
+  Auto-generates API docs from OpenAPI specs, skill guides, and architecture documentation.
+  Provides comprehensive developer and user documentation.
+
+instructions: |
+  # Docusaurus Deploy
+
+  Set up and deploy the LearnFlow documentation site to Kubernetes.
+
+  ## Steps
+
+  1. Initialize Docusaurus site:
+     ```bash
+     bash scripts/init.sh
+     ```
+
+  2. Generate documentation from specs and OpenAPI:
+     ```bash
+     python scripts/generate-docs.py
+     ```
+
+  3. Build and deploy to Kubernetes:
+     ```bash
+     bash scripts/deploy.sh
+     ```
+
+  4. Verify documentation is accessible:
+     ```bash
+     python scripts/verify.py
+     ```
+
+  5. Access the docs:
+     ```bash
+     kubectl port-forward svc/learnflow-docs 8080:80 -n learnflow
+     ```
+     Open: http://localhost:8080
+
+  ## What Gets Generated
+  - Platform architecture overview
+  - API reference (from OpenAPI specs)
+  - Skill development guide
+  - Deployment runbook
+  - Student/Teacher user guides
+
+  ## Validation Checklist
+  - Docusaurus site builds without errors
+  - Docs pod Running in learnflow namespace
+  - Homepage accessible at http://localhost:8080
+  - API docs auto-generated from OpenAPI specs
+
+activities:
+  - description: "Initialize Docusaurus"
+    command: "bash .claude/skills/docusaurus-deploy/scripts/init.sh"
+  - description: "Generate docs from specs"
+    command: "python .claude/skills/docusaurus-deploy/scripts/generate-docs.py"
+  - description: "Deploy to Kubernetes"
+    command: "bash .claude/skills/docusaurus-deploy/scripts/deploy.sh"
+  - description: "Verify docs deployment"
+    command: "python .claude/skills/docusaurus-deploy/scripts/verify.py"
+
+extensions:
+  - type: builtin
+    name: developer
