@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
     const answeredQuestions = QUIZ_QUESTIONS.filter(q => questionIds?.includes(q.id) || answers[q.id] !== undefined)
 
     let correct = 0
-    const results: any[] = []
+    const results: Record<string, unknown>[] = []
 
     for (const q of answeredQuestions) {
       const selected = answers[q.id]

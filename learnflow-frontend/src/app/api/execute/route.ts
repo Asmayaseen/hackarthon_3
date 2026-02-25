@@ -32,9 +32,10 @@ export async function POST(req: NextRequest) {
       })
       unlinkSync(tmpFile)
       return NextResponse.json({ output: output || '(no output)', error: null })
-    } catch (err: any) {
+    } catch (err: unknown) {
       unlinkSync(tmpFile)
-      const errOutput = err.stdout || err.stderr || err.message || 'Execution failed'
+      const e = err as { stdout?: string; stderr?: string; message?: string }
+      const errOutput = e.stdout || e.stderr || e.message || 'Execution failed'
       return NextResponse.json({ output: '', error: errOutput })
     }
   } catch {
