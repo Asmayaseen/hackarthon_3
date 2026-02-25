@@ -50,7 +50,7 @@ export default function MasteryChart({ data = [], isLoading = false }: { data: C
             color: isDark ? '#f1f5f9' : '#0f172a',
             fontSize: 12,
           }}
-          formatter={(value: number) => [`${value}%`, 'Mastery']}
+          formatter={(value: number | undefined): [string, string] => [`${value ?? 0}%`, 'Mastery']}
         />
         <Area
           type="monotone"

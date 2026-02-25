@@ -26,11 +26,11 @@ export default function MonacoEditor({ onChange, onSubmit }: MonacoEditorProps) 
         fontSize: 14,
         wordWrap: 'on',
       }}
-      onMount={(editor) => {
+      onMount={(editor, monacoInstance) => {
         editor.addAction({
           id: 'submit-code',
           label: 'Submit Code',
-          keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter],
+          keybindings: [monacoInstance.KeyMod.CtrlCmd | monacoInstance.KeyCode.Enter],
           run: () => onSubmit(code),
         });
       }}

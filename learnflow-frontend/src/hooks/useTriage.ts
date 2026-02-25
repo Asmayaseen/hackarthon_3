@@ -12,7 +12,8 @@ export function useTriage(setFeedback: (feedback: string) => void) {
       const response = await triageQuery(code);
       setFeedback(JSON.stringify(response, null, 2));
     } catch (error) {
-      setFeedback(`Error: ${error.message}`);
+      const msg = error instanceof Error ? error.message : 'Unknown error'
+      setFeedback(`Error: ${msg}`);
     } finally {
       setLoading(false);
     }

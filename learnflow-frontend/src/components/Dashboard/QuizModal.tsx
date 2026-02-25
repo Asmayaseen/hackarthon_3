@@ -19,12 +19,15 @@ interface QuizResult {
   question: string
   isCorrect: boolean
   correctAnswer: string
+  correctLabel: string
   yourAnswer: string
 }
 
 interface QuizResults {
-  score: number
+  score?: number
   total: number
+  correct?: number
+  struggleDetected?: boolean
   results?: QuizResult[]
 }
 
@@ -92,8 +95,9 @@ export default function QuizModal({ open, onOpenChange, onSuccess }: QuizModalPr
     }
   }
 
-  const scoreColor = results?.score >= 80 ? 'text-emerald-500' : results?.score >= 50 ? 'text-amber-500' : 'text-red-500'
-  const scoreBg = results?.score >= 80 ? 'bg-emerald-500/10 border-emerald-500/30' : results?.score >= 50 ? 'bg-amber-500/10 border-amber-500/30' : 'bg-red-500/10 border-red-500/30'
+  const score = results?.score ?? 0
+  const scoreColor = score >= 80 ? 'text-emerald-500' : score >= 50 ? 'text-amber-500' : 'text-red-500'
+  const scoreBg = score >= 80 ? 'bg-emerald-500/10 border-emerald-500/30' : score >= 50 ? 'bg-amber-500/10 border-amber-500/30' : 'bg-red-500/10 border-red-500/30'
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -229,7 +233,7 @@ export default function QuizModal({ open, onOpenChange, onSuccess }: QuizModalPr
               {/* Score card */}
               <div className={`rounded-xl border p-5 text-center ${scoreBg}`}>
                 <Trophy className={`h-8 w-8 mx-auto mb-2 ${scoreColor}`} />
-                <p className={`text-4xl font-extrabold ${scoreColor}`}>{results.score}%</p>
+                <p className={`text-4xl font-extrabold ${scoreColor}`}>{score}%</p>
                 <p className="text-muted-foreground text-sm mt-1">
                   {results.correct} of {results.total} correct
                 </p>
