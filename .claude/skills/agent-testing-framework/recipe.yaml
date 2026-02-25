@@ -1,0 +1,43 @@
+version: "1.0"
+title: "agent-testing-framework"
+description: |
+  Automated testing framework for LearnFlow AI agent interactions.
+  Tests routing accuracy, response quality, exercise validity, and
+  end-to-end tutoring flows with minimal token usage.
+
+instructions: |
+  # Agent Testing Framework
+
+  Run automated tests for LearnFlow AI agents.
+
+  ## Steps
+
+  1. Run all agent tests:
+     ```bash
+     python scripts/run_tests.py
+     ```
+
+  2. Test specific agent:
+     ```bash
+     python scripts/run_tests.py --agent concepts
+     ```
+
+  3. Validate skill outputs:
+     ```bash
+     python scripts/validate_skills.py
+     ```
+
+  ## Validation
+  - All tests pass with > 80% accuracy
+  - Response time < 5s per query
+  - No syntax errors in generated Python code
+
+activities:
+  - description: "Run agent tests"
+    command: "python .claude/skills/agent-testing-framework/scripts/run_tests.py"
+  - description: "Validate skills"
+    command: "python .claude/skills/agent-testing-framework/scripts/validate_skills.py"
+
+extensions:
+  - type: builtin
+    name: developer

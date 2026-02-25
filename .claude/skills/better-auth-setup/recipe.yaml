@@ -1,0 +1,50 @@
+version: "1.0"
+title: "better-auth-setup"
+description: |
+  Configure Better Auth for LearnFlow with JWT authentication, student/teacher
+  roles, and PostgreSQL session storage. Provides secure login, registration,
+  and role-based access control for the platform.
+
+instructions: |
+  # Better Auth Setup
+
+  Add JWT-based authentication to LearnFlow.
+
+  ## Steps
+
+  1. Install Better Auth packages:
+     ```bash
+     bash scripts/install.sh
+     ```
+
+  2. Generate auth configuration:
+     ```bash
+     python scripts/configure.py
+     ```
+
+  3. Run database migrations:
+     ```bash
+     bash scripts/migrate.sh
+     ```
+
+  4. Verify auth endpoints work:
+     ```bash
+     python scripts/verify.py
+     ```
+
+  ## Validation
+  - Auth tables exist in PostgreSQL
+  - JWT tokens issued on POST /auth/login
+  - Role-based routes return 401 without valid token
+
+activities:
+  - description: "Install Better Auth"
+    command: "bash .claude/skills/better-auth-setup/scripts/install.sh"
+  - description: "Configure auth"
+    command: "python .claude/skills/better-auth-setup/scripts/configure.py"
+  - description: "Verify auth"
+    command: "python .claude/skills/better-auth-setup/scripts/verify.py"
+
+extensions:
+  - type: builtin
+    name: developer

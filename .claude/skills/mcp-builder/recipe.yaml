@@ -1,0 +1,47 @@
+version: "1.0"
+title: "mcp-builder"
+description: |
+  Build new MCP servers using FastMCP with minimal token overhead for LearnFlow
+  AI agents. Scaffold, implement, test, and register new context providers
+  following the MCP Code Execution pattern.
+
+instructions: |
+  # MCP Builder
+
+  Create a new MCP server for LearnFlow AI agents.
+
+  ## Steps
+
+  1. Scaffold new MCP server:
+     ```bash
+     python scripts/scaffold.py --name <tool-name> --port <port>
+     ```
+
+  2. Implement tool functions using @mcp.tool() decorator.
+
+  3. Test the server:
+     ```bash
+     python scripts/test_mcp.py --server <tool-name>
+     ```
+
+  4. Register with agents:
+     ```bash
+     python scripts/register.py --server <tool-name>
+     ```
+
+  ## Token Rule: Each tool must return < 100 tokens.
+
+  ## Validation
+  - MCP server returns tool list at /tools
+  - Each tool output < 100 tokens
+  - Tools registered in .mcp.json
+
+activities:
+  - description: "Scaffold MCP server"
+    command: "python .claude/skills/mcp-builder/scripts/scaffold.py"
+  - description: "Test MCP server"
+    command: "python .claude/skills/mcp-builder/scripts/test_mcp.py"
+
+extensions:
+  - type: builtin
+    name: developer
