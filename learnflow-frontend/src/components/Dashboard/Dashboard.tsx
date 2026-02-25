@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { useProgress } from '@/hooks/useProgress'
 import { toast } from 'sonner'
@@ -197,7 +197,7 @@ export default function Dashboard() {
 }
 
 function StatCard({ icon: Icon, label, value, sub, color, bg }: {
-  icon: any; label: string; value: string; sub: string; color: string; bg: string
+  icon: React.ElementType; label: string; value: string; sub: string; color: string; bg: string
 }) {
   return (
     <div className="p-4 rounded-xl border border-border bg-card hover:border-primary/30 transition-all">

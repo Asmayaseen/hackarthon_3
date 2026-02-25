@@ -14,6 +14,20 @@ interface Question {
   topic: string
 }
 
+interface QuizResult {
+  id: number
+  question: string
+  isCorrect: boolean
+  correctAnswer: string
+  yourAnswer: string
+}
+
+interface QuizResults {
+  score: number
+  total: number
+  results?: QuizResult[]
+}
+
 interface QuizModalProps {
   open: boolean
   onOpenChange: (open: boolean) => void
@@ -27,7 +41,7 @@ export default function QuizModal({ open, onOpenChange, onSuccess }: QuizModalPr
   const [answers, setAnswers] = useState<Record<number, number>>({})
   const [current, setCurrent] = useState(0)
   const [phase, setPhase] = useState<Phase>('loading')
-  const [results, setResults] = useState<any>(null)
+  const [results, setResults] = useState<QuizResults | null>(null)
   const [submitting, setSubmitting] = useState(false)
 
   useEffect(() => {
@@ -228,7 +242,7 @@ export default function QuizModal({ open, onOpenChange, onSuccess }: QuizModalPr
 
               {/* Per-question breakdown */}
               <div className="space-y-2 max-h-52 overflow-y-auto pr-1">
-                {results.results?.map((r: any, i: number) => (
+                {results.results?.map((r: QuizResult, i: number) => (
                   <div key={r.id} className={`flex items-start gap-2.5 p-3 rounded-lg border text-sm ${r.isCorrect ? 'bg-emerald-500/5 border-emerald-500/20' : 'bg-red-500/5 border-red-500/20'}`}>
                     {r.isCorrect
                       ? <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0 mt-0.5" />

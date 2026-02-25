@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
@@ -236,7 +236,7 @@ export default function TeacherDashboard() {
               <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide block mb-1.5">Difficulty</label>
               <select
                 value={exerciseReq.difficulty}
-                onChange={e => setExerciseReq(p => ({ ...p, difficulty: e.target.value as any }))}
+                onChange={e => setExerciseReq(p => ({ ...p, difficulty: e.target.value as 'easy' | 'medium' | 'hard' }))}
                 className="w-full px-3.5 py-2.5 bg-muted border border-border rounded-xl text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-all"
               >
                 <option value="easy">Easy</option>
@@ -283,7 +283,7 @@ export default function TeacherDashboard() {
 }
 
 function StatCard({ icon: Icon, label, value, sub, color, bg }: {
-  icon: any; label: string; value: string; sub: string; color: string; bg: string
+  icon: React.ElementType; label: string; value: string; sub: string; color: string; bg: string
 }) {
   return (
     <div className="p-4 rounded-xl border border-border bg-card hover:border-primary/30 transition-all">
