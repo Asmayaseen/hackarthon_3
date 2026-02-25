@@ -22,7 +22,7 @@ spec:
     spec:
       containers:
         - name: mcp-server
-          image: learnflow/mcp-server:latest
+          image: ghcr.io/Asmayaseen/learnflow-mcp-server:593d1ac
           imagePullPolicy: Never
           ports:
             - containerPort: 8006
