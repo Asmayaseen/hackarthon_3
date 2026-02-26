@@ -6,7 +6,7 @@ const nextConfig: NextConfig = {
     return [
       {
         source: "/api/triage/:path*",
-        destination: `${process.env.TRIAGE_SERVICE_URL || "http://localhost:8080"}/:path*`,
+        destination: `${process.env.TRIAGE_SERVICE_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/:path*`,
       },
     ];
   },

@@ -146,8 +146,15 @@ def chat(
     if AI_AVAILABLE and client:
         messages = [{"role": "system", "content": SYSTEM_PROMPTS[mode]}]
         for h in history[-8:]:
-            messages.append({"role": "user",      "content": h[0]})
-            messages.append({"role": "assistant", "content": h[1]})
+            # Support both Gradio 4 tuple format and Gradio 5 dict format
+            if isinstance(h, dict):
+                if h.get("role") == "user":
+                    messages.append({"role": "user", "content": h["content"]})
+                elif h.get("role") == "assistant":
+                    messages.append({"role": "assistant", "content": h["content"]})
+            else:
+                messages.append({"role": "user",      "content": h[0]})
+                messages.append({"role": "assistant", "content": h[1]})
         messages.append({"role": "user", "content": f"[Level: {level}] {message}"})
         try:
             resp = client.chat.completions.create(
@@ -161,7 +168,9 @@ def chat(
             f"**[Demo mode – no API key]**\n\n{DEMO_RESPONSES.get(mode, 'Please set OPENAI_API_KEY.')}"
         )
 
-    history.append((message, reply))
+    # Append in Gradio 5 dict format
+    history.append({"role": "user", "content": message})
+    history.append({"role": "assistant", "content": reply})
     session_count += 1
     return "", history, session_count, get_progress_html(session_count, level)
 
@@ -221,7 +230,7 @@ with gr.Blocks(
         with gr.Tab("💬 AI Tutor"):
             with gr.Row():
                 with gr.Column(scale=3):
-                    chatbot = gr.Chatbot(height=400, label="Conversation")
+                    chatbot = gr.Chatbot(height=400, label="Conversation", type="messages")
                     with gr.Row():
                         msg_box = gr.Textbox(
                             placeholder="Ask anything about Python…",

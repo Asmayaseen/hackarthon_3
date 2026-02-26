@@ -1,0 +1,15 @@
+{
+  "buildCommand": "npm run build",
+  "outputDirectory": ".next",
+  "framework": "nextjs",
+  "env": {
+    "NEXT_PUBLIC_API_URL": "https://huggingface.co/spaces/Asma-yaseen/learnflow-ai-tutor",
+    "NEXT_PUBLIC_HF_SPACE": "https://Asma-yaseen-learnflow-ai-tutor.hf.space"
+  },
+  "rewrites": [
+    {
+      "source": "/api/triage/:path*",
+      "destination": "https://Asma-yaseen-learnflow-ai-tutor.hf.space/:path*"
+    }
+  ]
+}
