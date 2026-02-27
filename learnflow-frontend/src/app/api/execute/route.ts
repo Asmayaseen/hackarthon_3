@@ -1,8 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { execSync } from 'child_process'
-import { writeFileSync, unlinkSync } from 'fs'
-import { tmpdir } from 'os'
-import { join } from 'path'
 
 export async function POST(req: NextRequest) {
   try {
@@ -20,25 +16,37 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Write code to temp file
-    const tmpFile = join(tmpdir(), `learnflow_${Date.now()}.py`)
-    writeFileSync(tmpFile, code)
+    // Use Piston API for remote code execution (Vercel has no Python runtime)
+    const response = await fetch('https://emkc.org/api/v2/piston/execute', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        language: 'python',
+        version: '3.10.0',
+        files: [{ content: code }],
+      }),
+      signal: AbortSignal.timeout(10000),
+    })
 
-    try {
-      const output = execSync(`timeout 5 python3 ${tmpFile} 2>&1`, {
-        timeout: 6000,
-        encoding: 'utf-8',
-        maxBuffer: 50 * 1024,
-      })
-      unlinkSync(tmpFile)
-      return NextResponse.json({ output: output || '(no output)', error: null })
-    } catch (err: unknown) {
-      unlinkSync(tmpFile)
-      const e = err as { stdout?: string; stderr?: string; message?: string }
-      const errOutput = e.stdout || e.stderr || e.message || 'Execution failed'
-      return NextResponse.json({ output: '', error: errOutput })
+    if (!response.ok) {
+      return NextResponse.json({ output: '', error: 'Code execution service unavailable. Please try again.' })
     }
-  } catch {
+
+    const result = await response.json()
+    const run = result.run || {}
+    const output = run.stdout || ''
+    const stderr = run.stderr || ''
+
+    if (run.code !== 0 && stderr) {
+      return NextResponse.json({ output, error: stderr })
+    }
+
+    return NextResponse.json({ output: output || '(no output)', error: null })
+  } catch (err: unknown) {
+    const e = err as { name?: string }
+    if (e.name === 'TimeoutError') {
+      return NextResponse.json({ output: '', error: 'Execution timed out (10s limit).' })
+    }
     return NextResponse.json({ output: '', error: 'Server error during execution' })
   }
 }
